@@ -48,6 +48,13 @@ while(<I>){
     my $light=1;
     my ($total_num,$missing_num)=(0,0);
     for(my $i=9;$i<@a;$i++){
+	if($a[$i]=~/\.\/\./){
+	    $missing_num++;
+	}
+	$total_num++;
+    }
+    next if($missing_num/$total_num > 0.5);
+    for(my $i=9;$i<@a;$i++){
         my $id=$head[$i];
         my $base="N";
 
@@ -67,9 +74,6 @@ while(<I>){
             }
         }
 	$light=0 if($base eq "N");
-	$missing_num++ if($base eq "N");
-	$total_num++;
-	next if($missing_num/$total_num > 0.5);
         $seq{$id}.=$base;
     }
     $effective_length++ if($light==1);
