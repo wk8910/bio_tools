@@ -1,4 +1,5 @@
 #! /usr/bin/env perl
+# only useful for rooted tree
 use strict;
 use warnings;
 
