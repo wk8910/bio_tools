@@ -31,5 +31,5 @@ foreach my $fs(@fs){
 
 print O "$head\n";
 print O join " ",@content,"\n";
-print O "$tail\n";
+# print O "$tail\n";
 close O;
