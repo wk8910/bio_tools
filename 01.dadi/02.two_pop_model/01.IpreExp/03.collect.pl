@@ -4,9 +4,10 @@ use warnings;
 
 my $result_dir="01.output";
 my $length_file="effective.len";
-my $miu=1.26e-8;
-my $gen_time=6;
+my $miu=3.75e-8;
+my $gen_time=15;
 my $out_file="$0.sta";
+my $param_file="$0.param";
 my $fs="dadi.fs";
 
 my @files=<$result_dir/*>;
@@ -36,27 +37,48 @@ chomp $length;
 print "$length\n";
 close I;
 
-open S,">> $out_file";
+open S,">> $out_file" or die "Cannot modify $out_file\n";
 print S "### new result ###\n";
 my $time=`date`;
 chomp $time;
 print S "$time\n";
+open L,"> $param_file" or die "Cannot create $param_file\n";
+my $control=0;
 foreach my $file(sort {$hash{$b}{likelihood} <=> $hash{$a}{likelihood}} keys %hash){
     my $param_name=$hash{$file}{param_name};
     my $param_value=$hash{$file}{param_value};
     my @names=split(/\s+/,$param_name);
     my @params=split(/\s+/,$param_value);
-    &plot(@params);
-    print "$file\n";
-    print S "$file\n";
-    print "$param_name\n$param_value\n";
-    print S "$param_name\n$param_value\n";
+    # &plot(@params);
+    my @head;
+    my @content;
+    if($control==0){
+	print "$file\n";
+	print S "$file\n";
+	print "$param_name\n$param_value\n";
+	print S "$param_name\n$param_value\n";
+    }
+    push @head,"file_name";
+    push @content,$file;
+
+    push @head,"likelihood";
+    push @content,$params[0];
+
     my $theta=$params[1]/$length;
-    print "theta:\t$theta\n";
-    print S "theta:\t$theta\n";
+    if($control==0){
+	print "theta:\t$theta\n";
+	print S "theta:\t$theta\n";
+    }
+    push @head,"theta";
+    push @content,$theta;
     my $nref=$theta/(4*$miu);
-    print "Nref:\t$nref\n";
-    print S "Nref:\t$nref\n";
+    if($control==0){
+	print "Nref:\t$nref\n";
+	print S "Nref:\t$nref\n";
+    }
+    push @head,"Nref";
+    push @content,$nref;
+
     for(my $i=2;$i<@names;$i++){
         $names[$i]=~/^(\w)\./;
         my $type=$1;
@@ -72,12 +94,22 @@ foreach my $file(sort {$hash{$b}{likelihood} <=> $hash{$a}{likelihood}} keys %ha
             # $param = 2 * $nref * $param;
             $param = $param / (2 * $nref);
         }
-        print "$type\t$names[$i]\t$param\n";
-        print S "$type\t$names[$i]\t$param\n";
+	if($control==0){
+	    print "$type\t$names[$i]\t$param\n";
+	    print S "$type\t$names[$i]\t$param\n";
+	}
+	push @head,$names[$i];
+	push @content,$param;
     }
-    last;
+    if($control == 0){
+	print L join "\t",@head,"\n";
+    }
+    print L join "\t",@content,"\n";
+    $control++;
+    # last;
 }
 close S;
+close L;
 
 sub plot{
     my @params=@_;
