@@ -29,7 +29,7 @@ while(<I>){
     my @a=split(/\s+/);
     my ($chr,$pos,$ref,$alt)=($a[0],$a[1],$a[3],$a[4]);
     $chr=&replace($chr);
-    if($ref ne $hash{$chr}{$pos} && $alt eq $hash{$chr}{$pos}){
+    if($ref ne $hash{$chr}{$pos}){
         for(my $i=9;$i<@a;$i++){
             if($a[$i]=~/^([01][\/\|][10])/){
 		$content=$1;
@@ -37,8 +37,8 @@ while(<I>){
 		$a[$i]=$content;
 	    }
 	}
-	$a[4]=$ref;
-	$a[3]=$alt;
+	$a[4]=$a[3];
+	$a[3]=$hash{$chr}{$pos};
     }
     if($a[4] eq "."){
 	$a[4]=$a[3];
