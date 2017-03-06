@@ -6,12 +6,12 @@ my $vcf="merge.vcf.gz";
 my $out="merge.gz";
 my $popList="pop.lst";
 
-"""
+=cut
 Sample of poplist:
 ind1 pop1
 ind2 pop1
 ind3 pop2
-"""
+=cut
 
 my %sample2pop;
 my %popList;
