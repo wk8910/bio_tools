@@ -37,7 +37,7 @@ def mig_iso(params, ns, pts):
     n1,n2: Sample sizes of resulting Spectrum
     pts: Number of grid points to use in integration.
     """
-    nuPre,TPre,s,nu1,nu2,T,tx,m12,m21 = params
+    nuPre,TPre,s,nu1,nu2,T1,T2,m12,m21 = params
 
     xx = Numerics.default_grid(pts)
 
@@ -47,18 +47,14 @@ def mig_iso(params, ns, pts):
 
     nu1_0 = nuPre*s
     nu2_0 = nuPre*(1-s)
+
+    T = T1+T2
+    
     nu1_func = lambda t: nu1_0 * (nu1/nu1_0)**(t/T)
     nu2_func = lambda t: nu2_0 * (nu2/nu2_0)**(t/T)
 
-    T1 = T*tx
-    T2 = T*(1-tx)
-
     phi = Integration.two_pops(phi, xx, T1, nu1_func, nu2_func,m12=m12, m21=m21)
-
-    nu1_func = lambda t: nu1_0 * (nu1/nu1_0)**((t+T1)/T)
-    nu2_func = lambda t: nu2_0 * (nu2/nu2_0)**((t+T1)/T)
-
-    phi = Integration.two_pops(phi, xx, T2, nu1_func, nu2_func,m12=0, m21=0)
+    phi = Integration.two_pops(phi, xx, T, nu1_func, nu2_func,m12=0, m21=0, initial_t = T1)
 
     fs = Spectrum.from_phi(phi, ns, (xx,xx))
     return fs
@@ -86,6 +82,6 @@ print('Optimal value of theta: {0}\n'.format(theta))
 
 result=[ll_model,theta]+popt.tolist()
 print('###DADIOUTPUT###')
-# params = (nuPre,TPre,s,nu1,nu2,T,tx,m12,m21)
-print('likelihood\ttheta\tN.nuPre\tT.Tpre\tO.s\tN.nu1\tN.nu2\tT.T\tO.tx\tM.m12\tM.m21')
+# params = (nuPre,TPre,s,nu1,nu2,T1,T2,m12,m21)
+print('likelihood\ttheta\tN.nuPre\tT.Tpre\tO.s\tN.nu1\tN.nu2\tT.T1\tT.T2\tM.m12\tM.m21')
 print("\t".join(map(str,result)))
