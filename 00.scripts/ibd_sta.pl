@@ -24,7 +24,6 @@ while(<I>){
     my ($id1,$id1_idx,$id2,$id2_idx,$chr,$start,$end,$lod)=@a;
     my $len=$end-$start+1;
     $result{$id1}{$id2}+=$len;
-    $result{$id2}{$id1}+=$len;
 }
 close I;
 
