@@ -19,19 +19,19 @@ while(<I>){
     my $left=int($start/$window_size);
     my $right=int($end/$window_size);
     if($left<$right){
-	for(my $i=$left+1;$i<=$right;$i++){
-	    my $temp_end=$i * $window_size - 1;
-	    # print "$chr\t$start\t$temp_end\n";
-	    &save($chr,$start,$temp_end,$number);
-	    $start = $i * $window_size;
-	}
-	my $temp_start = $right * $window_size;
-	# print "$chr\t$temp_start\t$end\n";
-	&save($chr,$temp_start,$end,$number);
+        for(my $i=$left+1;$i<=$right;$i++){
+            my $temp_end=$i * $window_size - 1;
+            # print "$chr\t$start\t$temp_end\n";
+            &save($chr,$start,$temp_end,$number);
+            $start = $i * $window_size;
+        }
+        my $temp_start = $right * $window_size;
+        # print "$chr\t$temp_start\t$end\n";
+        &save($chr,$temp_start,$end,$number);
     }
     else{
-	# print "$chr\t$start\t$end\n";
-	&save($chr,$start,$end,$number);
+        # print "$chr\t$start\t$end\n";
+        &save($chr,$start,$end,$number);
     }
 }
 close I;
@@ -65,7 +65,7 @@ print STDERR "Reading vcf now!\n";
 
 my $control=0;
 my $present_bar_code="NA";
-open(O,"| gzip - > gatk_snp.vcf.gz");
+open(O,"| gzip - > $out");
 foreach my $vcf(@vcf){
     print STDERR "Reading $vcf\n";
     open(I,"zcat $vcf |");
