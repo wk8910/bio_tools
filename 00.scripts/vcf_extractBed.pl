@@ -2,10 +2,10 @@
 use strict;
 use warnings;
 
-my $vcf_dir="vcf_dir";
+my $vcf_dir="vcf";
 my @vcf=<$vcf_dir/*.vcf.gz>;
 my $out="non_repeat.vcf.gz";
-my $non_repeat="non_repeat.bed";
+my $non_repeat="keep.bed";
 my $window_size=10000;
 
 my %non_repeat;
@@ -70,26 +70,26 @@ foreach my $vcf(@vcf){
     print STDERR "Reading $vcf\n";
     open(I,"zcat $vcf |");
     while(<I>){
-	if(/^#/){
-	    next if($control>0);
-	    print O "$_";
-	}
-	else{
-	    chomp;
-	    my @a=split(/\s+/);
-	    next unless($a[7]=~/DP=(\d+)/);
-	    my $dp=$1;
-	    next if($dp > 2900 || $dp < 116);
-	    my ($chr,$pos)=($a[0],$a[1]);
-	    my $left=int($pos/$window_size);
-	    my $bar_code="$chr"."-".$left;
-	    if($bar_code ne $present_bar_code){
-		&decompress($bar_code);
-		$present_bar_code=$bar_code;
-	    }
-	    next unless(exists $check_list{$pos});
-	    print O "$_\n";
-	}
+        if(/^#/){
+            next if($control>0);
+            print O "$_";
+        }
+        else{
+            chomp;
+            my @a=split(/\s+/);
+            next unless($a[7]=~/DP=(\d+)/);
+            my $dp=$1;
+            # next if($dp > 2900 || $dp < 116);
+            my ($chr,$pos)=($a[0],$a[1]);
+            my $left=int($pos/$window_size);
+            my $bar_code="$chr"."-".$left;
+            if($bar_code ne $present_bar_code){
+	&decompress($bar_code);
+	$present_bar_code=$bar_code;
+            }
+            next unless(exists $check_list{$pos});
+            print O "$_\n";
+        }
     }
     close I;
     $control++;
@@ -100,10 +100,10 @@ sub decompress{
     my $bar_code=shift;
     %check_list=();
     foreach my $number(keys %{$non_repeat{$bar_code}}){
-	my $start=$non_repeat{$bar_code}{$number}{start};
-	my $end=$non_repeat{$bar_code}{$number}{end};
-	for(my $i=$start;$i<=$end;$i++){
-	    $check_list{$i}=1;
-	}
+        my $start=$non_repeat{$bar_code}{$number}{start};
+        my $end=$non_repeat{$bar_code}{$number}{end};
+        for(my $i=$start;$i<=$end;$i++){
+            $check_list{$i}=1;
+        }
     }
 }
