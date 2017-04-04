@@ -3,7 +3,7 @@ use strict;
 use warnings;
 
 my ($vcf,$list)=@ARGV;
-# $file is the location of genome file; $list is like this:
+# $list is like this:
 # BEGIN
 # sample1    population1
 # sample2    population1
