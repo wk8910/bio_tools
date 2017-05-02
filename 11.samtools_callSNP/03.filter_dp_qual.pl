@@ -2,8 +2,8 @@
 use strict;
 use warnings;
 
-my $in_dir="filter_step1";
-my $out_dir="filter_step2";
+my $in_dir="vcf_step2";
+my $out_dir="vcf_step3";
 my $script="filter_dp_qual.pl";
 `mkdir $out_dir` if(!-e $out_dir);
 my @vcf=<$in_dir/*.gz>;
