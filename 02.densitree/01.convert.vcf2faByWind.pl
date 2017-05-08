@@ -4,7 +4,7 @@ use warnings;
 
 my ($vcf,$outdir)=@ARGV;
 die "Usage: $0 <vcf file> <outdir>" if(!-e $vcf || ! $outdir);
-my $wind_size=50000;
+my $wind_size=500000;
 
 `mkdir $outdir` if(!-e $outdir);
 
@@ -84,7 +84,8 @@ close I;
 sub output{
     my $code=shift;
     return() if($code eq "NA");
-    if($effective_length/$wind_size < 0.2){
+    # if($effective_length/$wind_size < 0.2){
+    if($effective_length < 2000){
 	print STDERR "$effective_length\t$wind_size\n";
 	return();
     }
