@@ -26,7 +26,8 @@ name_len<-length(name);
 treenode<-read.tree.nodes(treestr,name)\$nodes;
 node_len<-nrow(treenode);
 newnode=noclock2clock(node_len,treenode,name_len);
-newnode[,4]=newnode[,4]*(1/max(newnode[,4]))
+node_height=node.height(node_len,newnode,name_len);
+newnode[,4]=newnode[,4]*(1/node_height);
 tree<-write.subtree(node_len,newnode,name,node_len);
 cat(tree)
 cat(\"\n\")
