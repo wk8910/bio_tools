@@ -35,18 +35,16 @@ foreach my $tree(@tree){
     my $light=1;
     while($line=~/\[(\d+)\]/g){
         my $bs=$1;
-        $light=0 if($bs<90);
+        $light=0 if($bs<70);
     }
     if($light==1){
         print O2 "$id\t$line\n";
         $line=~s/\[\d+\]//g;
         print O4 "$line\n";
     }
-    else{
-        print O1 "$id\t$line\n";
-        $line=~s/\[\d+\]//g;
-        print O3 "$line\n";
-    }
+    print O1 "$id\t$line\n";
+    $line=~s/\[\d+\]//g;
+    print O3 "$line\n";
     close I;
     # last if($control++>10);
 }
