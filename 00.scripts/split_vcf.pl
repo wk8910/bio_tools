@@ -33,7 +33,7 @@ while(<I>){
 	close O;
 	open O,"| gzip - > $outdir/$index.vcf.gz ";
 	print O "$head";
-	last if($control++>100);
+	# last if($control++>100);
     }
     $code=$index;
     print O "$_";
