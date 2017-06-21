@@ -37,9 +37,12 @@ my $min=$qual[0];
 my $max=$qual[-1];
 
 print "Qual score from $min to $max\n";
-if($min<64){
+if($min<64 && $max<93){
     print "Quality is 33 based\n";
 }
-else{
+elsif($min>=64){
     print "Quality is 64 based\n";
+}
+else{
+    print "Out of range. perhaps mixed quality!\n";
 }
