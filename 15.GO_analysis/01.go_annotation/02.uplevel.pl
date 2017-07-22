@@ -1,0 +1,42 @@
+#! /usr/bin/env perl
+use strict;
+use warnings;
+
+my $in="gac.go";
+my $out="Gene2GoID.table";
+my $leaf2root="Leaf2Root.txt";
+
+my %leaf2root;
+open I,"< $leaf2root";
+while (<I>) {
+    chomp;
+    my @a=split(/\s+/);
+    my @b=split(/;/,$a[1]);
+    foreach my $b(@b){
+        $leaf2root{$a[0]}{$b}=1;
+    }
+}
+close I;
+
+open I,"< $in";
+open O,"> $out";
+while (<I>) {
+    chomp;
+    my @a=split(/\s+/);
+    my $id=shift @a;
+    my %go;
+    foreach my $a(@a){
+        $go{$a}++;
+        if(exists $leaf2root{$a}){
+            foreach my $b(keys %{$leaf2root{$a}}){
+	$go{$b}++;
+            }
+        }
+    }
+    my @go=sort keys %go;
+    my @line=($id,@go);
+    my $line=join "\t",@line;
+    print O "$line\n";
+}
+close I;
+close O;
