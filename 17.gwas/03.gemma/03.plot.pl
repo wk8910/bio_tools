@@ -14,12 +14,12 @@ while(<I>){
     my @a=split(/\s+/);
     my $p=$a[-1]; # Change this to choose adjust method
     next if($p eq "NA");
-    $a[1]=~/(.*)-(\d+)$/;
+    # $a[1]=~/(.*)-(\d+)$/;
     my ($chr,$pos)=($a[0],$a[2]);
     # my $log=(log($p)/log(10))*-1;
     $hash{$chr}{$pos}{p}=$p;
     # $hash{$chr}{$pos}{log}=$log;
-    $hash{$chr}{$pos}{id}=$a[0];
+    $hash{$chr}{$pos}{id}=$a[0]."-".$a[2];
     if(!exists $len{$chr}){
 	$len{$chr}=$pos;
     }
@@ -34,7 +34,7 @@ print O "type\tpos\tid\tp\n";
 my $step=0;
 my $type=1;
 foreach my $chr(sort {$len{$b} <=> $len{$a}} keys %len){
-    foreach my $pos(sort {$b<=>$a} keys %{$hash{$chr}}){
+    foreach my $pos(sort {$a<=>$b} keys %{$hash{$chr}}){
 	my $p=$hash{$chr}{$pos}{p};
 	# my $log=$hash{$chr}{$pos}{log};
 	my $id=$hash{$chr}{$pos}{id};
