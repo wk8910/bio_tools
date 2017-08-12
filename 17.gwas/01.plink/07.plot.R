@@ -1,0 +1,5 @@
+library("ggplot2")
+a=read.table("06.plot.pl.txt",header=T)
+png(file="pvalue.png",width=2400,height=600)
+ggplot(a,aes(pos,log,color=type))+geom_point()
+dev.off()

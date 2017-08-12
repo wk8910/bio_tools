@@ -1,0 +1,8 @@
+library("ggplot2")
+a=read.table("04.plot.pl.txt",header=T)
+# a$fdr=p.adjust(a$p,method="bonferroni",n=length(a$p))
+# a$log=-1*(log(a$fdr)/log(10))
+a$log=-1*(log(a$p)/log(10))
+png(file="emmac.png",width=2400,height=600)
+ggplot(a,aes(pos,log,color=type))+geom_point()
+dev.off()
