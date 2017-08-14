@@ -1,51 +1,70 @@
 #! /usr/bin/perl
-# This script is used to reading fasta file without the help of BioPerl
 use strict;
 use warnings;
 
-my $file=shift;
-my $out="$file.clean.fas";
-my $log="$file.log";
-my $tool="/home/share/users/wangkun2010/bio_tools/00.scripts/read_fasta.pl";
+my $gff="Takifugu_rubripes.FUGU4.89.gff3";
+my $out="clean.gff";
 
-my %hash;
-open(I,"perl $tool $file |");
-while (my $id=<I>) {
-    chomp $id;
-    my $seq=<I>;
-    chomp $seq;
-    $id=~/^(\S+)/;
-    my $protein_id=$1;
-    $id=~/gene:([^\s\.]+)/;
-    my $gene_id=$1;
-    my $len=length($seq);
-    $hash{$gene_id}{$protein_id}=$len;
+my %length;
+my %gene_cds;
+open I,"< $gff";
+while (<I>) {
+    next if(/^#/);
+    my @a=split(/\s+/);
+    my ($chr,$source,$type,$start,$end,$score,$strand,$phase,$info)=@a;
+    if($type eq "CDS"){
+        $info=~/Parent=transcript:(\w+)/;
+        my $cds_id=$1;
+        $length{$cds_id}+=$end-$start+1;
+    }
+    elsif($type eq "mRNA"){
+        $info=~/transcript:(\w+).*Parent=gene:(\w+)/;
+        my ($cds_id,$gene_id)=($1,$2);
+        $gene_cds{$gene_id}{$cds_id}=1;
+    }
 }
 close I;
 
+foreach my $gene_id(keys %gene_cds){
+    foreach my $cds_id(keys %{$gene_cds{$gene_id}}){
+        if(exists $length{$cds_id}){
+            $gene_cds{$gene_id}{$cds_id}=$length{$cds_id};
+        }
+        else {
+            delete $gene_cds{$gene_id}{$cds_id};
+        }
+    }
+}
+
 my %keep;
-foreach my $gene_id(sort keys %hash){
-    my @protein_id=sort {$hash{$gene_id}{$b} <=> $hash{$gene_id}{$a}} keys %{$hash{$gene_id}};
+foreach my $gene_id(sort keys %gene_cds){
+    my @protein_id=sort {$gene_cds{$gene_id}{$b} <=> $gene_cds{$gene_id}{$a}} keys %{$gene_cds{$gene_id}};
     my $selected=$protein_id[0];
+    # $selected=~s/\.\d$//;
     $keep{$selected}=1;
 }
 
 open O,"> $out";
-open L,"> $log";
-open(I,"perl $tool $file |");
-while (my $id=<I>) {
-    chomp $id;
-    my $seq=<I>;
-    chomp $seq;
-    # print ">$id\n$seq\n";
-    $id=~/^(\S+)/;
-    my $protein_id=$1;
-    next unless(exists $keep{$protein_id});
-    $id=~/gene:([^\s\.]+)/;
-    my $gene_id=$1;
-    print L "$gene_id\t$protein_id\n";
-    print O ">$gene_id\n$seq\n";
+open I,"< $gff";
+while (<I>) {
+    chomp;
+    next if(/^#/);
+    my @a=split(/\s+/);
+    my ($chr,$source,$type,$start,$end,$score,$strand,$phase,$info)=@a;
+    if($type eq "CDS"){
+        $info=~/Parent=transcript:(\w+)/;
+        my $cds_id=$1;
+        next unless($keep{$cds_id});
+        s/transcript://g;
+        print O "$_\n";
+    }
+    elsif($type eq "mRNA"){
+        $info=~/transcript:(\w+).*Parent=gene:(\w+)/;
+        my ($cds_id,$gene_id)=($1,$2);
+        next unless($keep{$cds_id});
+        s/transcript://g;
+        print O "$_\n";
+    }
 }
 close I;
 close O;
-close L;
