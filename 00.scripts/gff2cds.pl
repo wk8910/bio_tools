@@ -41,7 +41,8 @@ close I;
 
 my $fa=Bio::SeqIO->new(-file=>$genome_fa,-format=>'fasta');
 
-open(O,"> $cds");
+my %whitelist;
+open(O,"> $cds.cds");
 open(E,"> $cds.pep");
 while(my $seq=$fa->next_seq){
     my $chr=$seq->id;
@@ -51,9 +52,10 @@ while(my $seq=$fa->next_seq){
     foreach my $name(keys %{$gff{$chr}}){
         my $strand="NA";
         my $line="";
+        my $light=0;
         foreach my $no(sort { $gff{$chr}{$name}{$a}{start} <=> $gff{$chr}{$name}{$b}{start} } keys %{$gff{$chr}{$name}}){
             if($strand eq "NA"){
-		$strand=$gff{$chr}{$name}{$no}{strand};
+	$strand=$gff{$chr}{$name}{$no}{strand};
             }
             my $start=$gff{$chr}{$name}{$no}{start};
             my $end=$gff{$chr}{$name}{$no}{end};
@@ -63,6 +65,10 @@ while(my $seq=$fa->next_seq){
         }
         if($strand eq "+"){
             my $pep=translate_nucl($line);
+            $pep=~/^(.*).$/;
+            my $stop_test=$1;
+            next if($stop_test=~/\*/);
+            $light=1;
             print O ">$name\n$line\n";
             print E ">$name\n$pep\n";
         }
@@ -70,11 +76,36 @@ while(my $seq=$fa->next_seq){
             $line=reverse($line);
             $line=~tr/ATCGatcg/TAGCtagc/;
             my $pep=translate_nucl($line);
+            $pep=~/^(.*).$/;
+            my $stop_test=$1;
+            next if($stop_test=~/\*/);
+            $light=1;
             print O ">$name\n$line\n";
             print E ">$name\n$pep\n";
         }
-        print STDERR "$chr\t$name\n";
+        if($light==1){
+            $whitelist{$name}=1;
+            print STDERR "$chr\t$name\n";
+        }
     }
 }
 close O;
 close E;
+
+open(I,"< $gff");
+open G,"> $cds.noStopCodon.gff";
+while(<I>){
+    chomp;
+    next if(/^#/);
+    next if(/^\s*$/);
+    my @a=split(/\s+/);
+    next unless($a[2] eq "CDS");
+    my ($chr,$start,$end,$strand,$phase,$name)=($a[0],$a[3],$a[4],$a[6],$a[7],$a[8]);
+    $chr=~s/chr//g;
+    $name=~/Parent=([^;]+)/;
+    $name=$1;
+    next unless(exists $whitelist{$name});
+    print G "$_\n";
+}
+close I;
+close G;
