@@ -2,10 +2,10 @@
 use strict;
 use warnings;
 
-my $result_dir="01.output";
+my $result_dir="output_dadi";
 my $length_file="effective.len";
-my $miu=3.75e-8;
-my $gen_time=15;
+my $miu=1.26e-8;
+my $gen_time=6;
 my $out_file="$0.sta";
 my $param_file="$0.param";
 my $fs="dadi.fs";
@@ -49,7 +49,7 @@ foreach my $file(sort {$hash{$b}{likelihood} <=> $hash{$a}{likelihood}} keys %ha
     my $param_value=$hash{$file}{param_value};
     my @names=split(/\s+/,$param_name);
     my @params=split(/\s+/,$param_value);
-    # &plot(@params);
+    &plot(@params) if($control==0);
     my @head;
     my @content;
     if($control==0){
@@ -128,7 +128,7 @@ import pylab
 import dadi
 
 data = dadi.Spectrum.from_file(\"$fs\")
-data = data.fold()
+# data = data.fold()
 ns = data.sample_sizes
 pts_l = [40,50,60]
 func = dadi.Demographics2D.IM_pre

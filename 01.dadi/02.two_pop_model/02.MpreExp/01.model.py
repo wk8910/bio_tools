@@ -11,7 +11,8 @@ import dadi
 spectrum_file = sys.argv[1]
 data = dadi.Spectrum.from_file(spectrum_file)
 
-data = data.fold()
+# data = data.fold()
+# data = data.project([10,16])
 ns = data.sample_sizes
 pts_l = [40,50,60]
 
