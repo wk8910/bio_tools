@@ -19,6 +19,7 @@ die "Usage: $0 <gff file> <genome file> <output>\n" if(@ARGV<3);
 #my $cds="btau461.fa.cds";
 
 my %gff;
+my %len;
 open(I,"< $gff");
 my $no=0;
 while(<I>){
@@ -28,10 +29,26 @@ while(<I>){
     my @a=split(/\s+/);
     next unless($a[2] eq "CDS");
     $no++;
-    my ($chr,$start,$end,$strand,$phase,$name)=($a[0],$a[3],$a[4],$a[6],$a[7],$a[8]);
+    my ($chr,$source,$start,$end,$strand,$phase,$name)=($a[0],$a[1],$a[3],$a[4],$a[6],$a[7],$a[8]);
     $chr=~s/chr//g;
     $name=~/Parent=([^;]+)/;
     $name=$1;
+    if(!exists $len{$name}){
+        $len{$name}{chr}=$chr;
+        $len{$name}{source}=$source;
+        $len{$name}{start}=$start;
+        $len{$name}{end}=$end;
+        $len{$name}{strand}=$strand;
+    }
+    else {
+        if($start < $len{$name}{start}){
+            $len{$name}{start}=$start;
+        }
+        if($end > $len{$name}{end}){
+            $len{$name}{end} = $end;
+        }
+    }
+    $len{$name}{cds}.=$_."\n";
     $gff{$chr}{$name}{$no}{start}=$start;
     $gff{$chr}{$name}{$no}{end}=$end;
     $gff{$chr}{$name}{$no}{strand}=$strand;
@@ -92,20 +109,37 @@ while(my $seq=$fa->next_seq){
 close O;
 close E;
 
-open(I,"< $gff");
-open G,"> $cds.noStopCodon.gff";
-while(<I>){
-    chomp;
-    next if(/^#/);
-    next if(/^\s*$/);
-    my @a=split(/\s+/);
-    next unless($a[2] eq "CDS");
-    my ($chr,$start,$end,$strand,$phase,$name)=($a[0],$a[3],$a[4],$a[6],$a[7],$a[8]);
-    $chr=~s/chr//g;
-    $name=~/Parent=([^;]+)/;
-    $name=$1;
-    next unless(exists $whitelist{$name});
-    print G "$_\n";
+open O,"> $cds.noStopCodon.gff";
+foreach my $name(sort keys %whitelist){
+    my $chr=$len{$name}{chr};
+    my $source=$len{$name}{source};
+    my $start=$len{$name}{start};
+    my $end=$len{$name}{end};
+    my $strand=$len{$name}{strand};
+    my @gene_line=($chr,$source,"gene",$start,$end,".",$strand,".","ID=$name;Parent=$name;");
+    my $gene_line=join "\t",@gene_line;
+    print O "$gene_line\n";
+    my @mrna_line=($chr,$source,"mRNA",$start,$end,".",$strand,".","ID=$name;Parent=$name;");
+    my $mrna_line=join "\t",@mrna_line;
+    print O "$mrna_line\n";
+    print O "$len{$name}{cds}";
 }
-close I;
-close G;
+close O;
+
+# open(I,"< $gff");
+# open G,"> $cds.noStopCodon.gff";
+# while(<I>){
+#     chomp;
+#     next if(/^#/);
+#     next if(/^\s*$/);
+#     my @a=split(/\s+/);
+#     next unless($a[2] eq "CDS");
+#     my ($chr,$start,$end,$strand,$phase,$name)=($a[0],$a[3],$a[4],$a[6],$a[7],$a[8]);
+#     $chr=~s/chr//g;
+#     $name=~/Parent=([^;]+)/;
+#     $name=$1;
+#     next unless(exists $whitelist{$name});
+#     print G "$_\n";
+# }
+# close I;
+# close G;
