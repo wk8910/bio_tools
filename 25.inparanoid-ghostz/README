@@ -1,0 +1,136 @@
+# README for INPARANOID version 4.0
+# 11 June 2009
+
+* Important notice: InParanoid 4.0 only supports BLAST version
+* 2.2.16 or higher. 
+
+This program package detects complex orthologous relationships between
+the protein sequences from different genomes. It uses BLAST scores to 
+measure relatedness of proteins. InParanoid assigns confidence values 
+for all paralogs in each group. It is also able to calculate confidence for
+orthologs using bootstrap approach.
+
+References:
+1. Remm,M., Storm, C. and E. Sonnhammer (2001). 
+Automatic Clustering of Orthologs and In-paralogs from Pairwise Species Comparisons. 
+J.Mol.Biol. 314:1041-1052
+
+2. O'Brien Kevin P, Remm Maido and Sonnhammer Erik L.L (2005). 
+Inparanoid: A Comprehensive Database of Eukaryotic Orthologs
+NAR 33:D476-D480
+
+3. Berglund AC, Sjölund E, Ostlund G, Sonnhammer ELL (2008)
+InParanoid 6: eukaryotic ortholog clusters with inparalogs"
+Nucleic Acids Res. 36:D263-266
+
+
+To detect orthologs with InParanoid:
+1. create a separate directory for each project
+2. unpack programs from inparanoid_programs.tar.gz to this directory
+3. Make sure you have the following files in the working directory:
+   inparanoid.pl
+   blast_parser.pl
+   BLOSUM62
+   BLOSUM45
+   BLOSUM62
+   PAM30
+   PAM70
+   seqstat.jar 
+   LICENSE
+
+(Note that if the BLOSUM* and PAM* files are not in the working
+directory, seqstat.jar - for bootstrapping - won't work.).
+
+4. Make sure you have installed 'blastall' and 'formatdb' from NCBI. 
+   
+5. Input sequences should be all protein sequences from given genome
+   The should be organized into two FASTA files - one for each species.
+   If you wish to use third species as outgroup give third FASTA file with
+   outgroup sequences. 
+   We have provided sample input files SC and EC in the package 
+   inparanoid_small.tar.gz
+
+6. Open the program 'inparanoid.pl' in text editor and check the relevant 
+   options on lines 22-65.
+
+$run_blast = 1;
+set it to 0 if you have already run BLAST and have corresponding BLAST
+output files. Sample output files EC-SC, EC-EC, SC-EC and SC-SC 
+are in the package inparanoid.tar.gz.
+
+$run_inparanoid = 1;
+set it to 0 if you only want to run BLAST and not inparanoid's
+clustering algorithm.
+
+$use_bootstrap = 0;
+Set it to 1, if you want to test main ortholog pair against second best
+ortholog pair. Takes slightly more time and requires java.
+
+$use_outgroup = 0;
+Set it to 1 if you have sequences from third, more distant genome and would
+like to test ortholog pairs against this third genome.
+
+$blastall = "blastall";
+$formatdb = "formatdb";
+It may work like this, but it is better to change this variable to absolute 
+path to these programs - for example
+"/usr/local/bin/blastall" and "/usr/local/bin/formatdb"
+
+$matrix = "BLOSUM62";
+Set it to BLOSUM45 to analyse distant species or to BLOSUM80 to analyse very
+closely related genomes. PAM30 and PAM70 are other possible choices.
+
+Other options are less relevant and are described in the program and in the
+JMB article.
+
+7. For parsing BLAST output so that InParanoid can work with it, the program 
+'blast_parser.pl' is needed. This in turn requires that the Perl XML parser
+library is installed on your system. If it is not in the default path, you
+can open this script in a text editor, uncomment the "use lib" lines near
+the top of the file, changing the path to wherever these Perl libraries
+reside on your system. The Blast parser assumes that the first word in
+the Fasta header line is a unique identifier.
+
+8. Examples of use:
+* To use InParanoid with sample files (500 proteins from E. coli and
+yeast) run the following command:
+
+   perl inparanoid.pl EC SC
+
+This will produce simple text file Output.EC-SC which contains all
+detected orthologs between the sample datasets.
+The same data is saved in other formats depending on what
+options are turned on.
+
+* If you start with your own sequences, write them into 2 fasta files and set
+the 'run_blast' variable in inparanoid.pl file to 1. Then the BLAST will
+run to generate all-versus-all hit score table. This can take several hours, 
+so it's better to leave it overnight. The command line will still look the same:
+
+perl inparanoid.pl FASTAFILE1 FASTAFILE2
+
+Please note: You need locally installed NCBI BLAST2 to do this.
+If you have not done so, download it from 
+ftp://ncbi.nlm.nih.gov/blast/executables/
+
+* If you have already run BLAST and want to run only ortholog detection
+then set run_blast variable to 0 and run the InParanoid again. Please
+remember that in this case the program expects to see 4 BLAST files
+(EC-SC, SC-EC, SC-SC, EC-EC) and 2 original FASTA files with sequences
+(SC and EC) in the same directory where you execute the InParanoid.
+ 
+* Optionally one can use outgroup sequences as third argument. For example:
+
+   perl inparanoid.pl HUMAN WORM PLANT
+
+In this case PLANT sequences are used as an outgroup and some of the false
+ortholog pairs are removed (if they are more similar to the outgroup than they
+are to each other).
+
+* Optionally one can use bootstrap as a confidence measure for the
+seed orthologs in each cluster. Set the variable use_bootstrap to 1 to do that.
+However this option slows down the whole process of ortholog detection.
+
+Good luck!
+Lycka till!
+Soovime edu!
