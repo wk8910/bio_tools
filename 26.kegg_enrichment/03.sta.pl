@@ -5,6 +5,7 @@ use Statistics::Multtest qw(:all);
 
 my ($target,$background,$out)=@ARGV;
 my $rscript="Rscript";
+my $min_ko=5; # min number of genes requred in a reported ko
 die "Usage: $0 <target list> <background list> <output file prefix>\n" if(@ARGV<3);
 $out="$out.koEnrichment";
 
@@ -40,12 +41,14 @@ while (<I>) {
 }
 close I;
 
-my $number=keys %kegg;
+my $number=0;
 open O,"> $out";
 print O "ko\tbackground\ttarget\tko\toverlap\tpvalue\tinfo\n";
 foreach my $ko(sort keys %kegg){
     my %selected;
     my $ko_number=keys %{$kegg{$ko}};
+    next if($ko_number<$min_ko);
+    $number++;
     foreach my $geneid(keys %{$kegg{$ko}}){
         if(exists $hash{$geneid}){
             $selected{$geneid}++;
@@ -62,7 +65,11 @@ close O;
 
 open O,"> $out.rscript";
 print O 'a=read.table("'.$out.'",sep="\t",header=T)
-a$fdr=p.adjust(a$pvalue,method="fdr")
+# a$fdr=p.adjust(a$pvalue,method="fdr")
+for(i in 1:length(a$pvalue))
+{
+    a$fdr[i]=p.adjust(a$pvalue[i],method="fdr",n='.$number.')
+}
 write.table(a,file="'."$out.fdr".'",quote=F,row.names=F,sep="\t")
 ';
 close O;
