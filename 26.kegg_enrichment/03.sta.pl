@@ -1,7 +1,6 @@
 #! /usr/bin/env perl
 use strict;
 use warnings;
-use Statistics::Multtest qw(:all);
 
 my ($target,$background,$out)=@ARGV;
 my $rscript="Rscript";
