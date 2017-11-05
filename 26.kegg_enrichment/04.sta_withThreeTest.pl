@@ -57,14 +57,16 @@ foreach my $ko(sort keys %kegg){
 # open O,"> $out";
 # print O "ko\tbackground\ttarget\tko\toverlap\tpvalue\tinfo\n";
 open R,"> $out.rscript";
-print R "result=\"ko\tbackground\ttarget\tko\toverlap\tinfo\tc\tcfdr\tf\tffdr\th\thfdr\"";
+print R "result=\"ko\tbackground\ttarget\tko\toverlap\tinfo\tc\tcfdr\tf\tffdr\th\thfdr\toverlapped_genes\"";
 foreach my $ko(sort keys %kegg){
     my %selected;
     my $ko_number=keys %{$kegg{$ko}};
     next if($ko_number<$min_ko);
+    my @genename;
     foreach my $geneid(keys %{$kegg{$ko}}){
         if(exists $hash{$geneid}){
             $selected{$geneid}++;
+            push @genename,$geneid;
         }
     }
     my $overlap=keys %selected;
@@ -79,6 +81,7 @@ foreach my $ko(sort keys %kegg){
     my @y=($overlap-1,$a,$b,$target_number);
     my $y=join ",",@y;
     my $info=$info{$ko};
+    my $genename= join ", ",@genename;
     my $prefix="$ko\t$background_number\t$target_number\t$ko_number\t$overlap\t$info";
     print R '
 c=chisq.test(matrix(c('.$x.'),nrow=2))
@@ -87,7 +90,7 @@ f=fisher.test(matrix(c('.$x.'),nrow=2),alternative="less")
 ffdr=p.adjust(f$p.value,method="fdr",n='.$number.')
 h=1-phyper('.$y.')
 hfdr=p.adjust(h,method="fdr",n='.$number.')
-line=paste("'.$prefix.'",c$p.value,cfdr,f$p.value,ffdr,h,hfdr,sep="\t")
+line=paste("'.$prefix.'",c$p.value,cfdr,f$p.value,ffdr,h,hfdr,"'.$genename.'",sep="\t")
 result=paste(result,line,sep="\n")
 ';
 }
