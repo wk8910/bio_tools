@@ -1,0 +1,18 @@
+1. use baseml to calculate the mutation rate.
+
+baseml output:
+Substitution rate is per time unit
+    0.358417 +- 0.001040
+
+
+2. calculate the rgene_gamma as the following formula。
+
+rgene_gamma = 1/0.358417 = 1.67
+
+3. fix the rgene_gamma in the mcmctree2.ctl and mcmctree3.ctl.
+
+4. run mcmctree.3.ctl and give a link to it's output file "out.BV" with 'in.BV'.
+
+5. creat two dir named 'r01' and 'r02'. copy the mcmctree2.ctl and in.BV to each dir, and running mcmctree to get the finnal results.
+
+6. make sure the mix value around 0.3 and the two running get the similar results.
