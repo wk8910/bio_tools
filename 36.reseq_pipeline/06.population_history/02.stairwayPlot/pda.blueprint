@@ -1,0 +1,24 @@
+#example blueprint file
+#input setting
+popid: pda # id of the population (no white space)
+nseq: 44 # number of sequences
+L: 150138393 # total number of observed nucleic sites, including polymorphic and monomorphic
+whether_folded: false # whethr the SFS is folded (true or false)
+SFS: 721693.709979 469830.678701 345054.377958 263626.807131 206218.734433 166140.225040 137857.628388 117380.940769 102355.879125 90990.092017 82791.967162 73419.302147 66870.196918 61206.889367 55725.307229 52563.655803 48205.286090 47216.507931 43350.684113 42335.376667 39882.891140 44534.552575 34896.042726 33902.632001 32506.012301 31203.813351 30405.806631 29629.883326 31232.562568 29384.008988 29613.829914 29255.307984 29804.811654 28955.647144 28502.758434 31138.094444 30561.001316 34052.983349 33779.416271 39704.761497 45443.587879 55783.534089 75800.188784 # snp frequency spectrum: number of singleton, number of doubleton, etc. (separated by white space)
+#smallest_size_of_SFS_bin_used_for_estimation: 2 # default is 1; to ignore singletons, change this number to 2
+#largest_size_of_SFS_bin_used_for_estimation: 42 # default is n-1; to ignore singletons, change this number to nseq-2
+pct_training: 0.67 # percentage of sites for training
+nrand: 10	21	31	42 # number of random break points for each try (separated by white space)
+project_dir: output # project directory
+stairway_plot_dir: stairway_plot_es # directory to the stairway plot files
+ninput: 200 # number of input files to be created for each estimation
+#output setting
+mu: 3.75e-8 # assumed mutation rate per site per generation
+year_per_generation: 15 # assumed generation time (in years)
+#plot setting
+plot_title: two-epoch # title of the plot
+xrange: 0.1,10000 # Time (1k year) range; format: xmin,xmax; "0,0" for default
+yrange: 0.1,300 # Ne (1k individual) range; format: xmin,xmax; "0,0" for default
+xspacing: 2 # X axis spacing
+yspacing: 2 # Y axis spacing
+fontsize: 12 # Font size

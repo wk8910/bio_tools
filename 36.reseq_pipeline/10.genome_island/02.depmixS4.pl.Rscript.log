@@ -1,0 +1,36 @@
+iteration 0 logLik: 8289.144 
+iteration 5 logLik: 9273.12 
+iteration 10 logLik: 9697.318 
+iteration 15 logLik: 9723.564 
+iteration 20 logLik: 9770.473 
+iteration 25 logLik: 9906.731 
+iteration 30 logLik: 10065.59 
+iteration 35 logLik: 10096.02 
+iteration 40 logLik: 10105.99 
+iteration 45 logLik: 10109.6 
+iteration 50 logLik: 10110.81 
+iteration 55 logLik: 10111.21 
+iteration 60 logLik: 10111.34 
+iteration 65 logLik: 10111.39 
+iteration 70 logLik: 10111.41 
+iteration 75 logLik: 10111.42 
+iteration 80 logLik: 10111.42 
+iteration 85 logLik: 10111.43 
+iteration 90 logLik: 10111.43 
+converged at iteration 94 with logLik: 10111.43 
+Initial state probabilties model 
+  pr1   pr2   pr3 
+0.224 0.304 0.472 
+
+Transition matrix 
+        toS1  toS2  toS3
+fromS1 0.701 0.291 0.008
+fromS2 0.100 0.792 0.108
+fromS3 0.006 0.171 0.823
+
+Response parameters 
+Resp 1 : gaussian 
+    Re1.(Intercept) Re1.sd
+St1           0.320  0.091
+St2           0.203  0.051
+St3           0.136  0.034

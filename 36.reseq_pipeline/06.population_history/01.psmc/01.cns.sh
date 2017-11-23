@@ -1,0 +1,1 @@
+samtools mpileup -d 150 -q 20 -Q 20 -l /home/share/user/user101/projects/yangshu/16.angsd/01.regions_without_repeat/01.generate_sites.pl.txt -uf /home/share/user/user101/projects/yangshu/11.ref/ptr.fa pro12-a.bam | bcftools call -c | vcfutils.pl vcf2fq | gzip - > cns.fq.gz

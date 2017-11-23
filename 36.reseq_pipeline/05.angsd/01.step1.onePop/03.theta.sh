@@ -1,0 +1,1 @@
+/home/share/user/user101/software/ngsTools/angsd/angsd -bam file.list -out pda_e -doThetas 1 -doSaf 1 -pest pda_e.sfs -anc ancestral -gl 1 -ref ancestral -only_proper_pairs 1 -uniqueOnly 1 -remove_bads 1 -C 50 -minMapQ 30 -minQ 20 -setMinDepth 35 -setMaxDepth 280 -sites /home/share/user/user101/projects/yangshu/16.angsd/01.regions_without_repeat/01.generate_sites.pl.txt -P 12
