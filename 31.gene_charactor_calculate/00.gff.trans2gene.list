@@ -1,0 +1,3 @@
+cow_test.gff	cow_test.trans2gene.len.txt	Ensembl
+sheep_test.gff	sheep_test.trans2gene.len.txt	Ensembl
+py_test.gff	py_test.trans2gene.len.txt	NCBI
