@@ -35,7 +35,7 @@ print O "plot_legend_4Exon_num = ggplot(read_4Exon_num,aes(V3,col=V1))+geom_dens
 push @out,"plot_legend_4Exon_num";
 
 
-print O "pdf(file=\"$0.pdf\",width=7,height=10)\n";
+print O "pdf(file=\"$0.pdf\",width=8,height=10)\n";
 print O "grid.arrange(",join(",",@out),",ncol=2)\n";
 print O "dev.off()\n";
 close O;

@@ -11,6 +11,6 @@ plot_3Intron = ggplot(read_3Intron,aes(V3,col=V1))+geom_density()+xlim(0,10000)+
 read_4Exon_num = read.table("02.Gene.stat.pl.Exon.num.txt",header=F)
 plot_4Exon_num = ggplot(read_4Exon_num,aes(V3,col=V1))+geom_density()+xlim(0,50)+xlab("Exon number")+ylab("Density")+theme_bw()+theme(legend.position="none")
 plot_legend_4Exon_num = ggplot(read_4Exon_num,aes(V3,col=V1))+geom_density()+xlim(0,50)+xlab("Exon number")+ylab("Density")+theme_bw()
-pdf(file="03.plot.pl.pdf",width=7,height=10)
+pdf(file="03.plot.pl.pdf",width=8,height=10)
 grid.arrange(plot_0mRNA,plot_1CDS,plot_2Exon,plot_3Intron,plot_4Exon_num,plot_legend_4Exon_num,ncol=2)
 dev.off()
