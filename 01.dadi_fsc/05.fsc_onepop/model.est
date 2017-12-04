@@ -1,0 +1,29 @@
+// Priors and rules file
+// *********************
+[PARAMETERS]
+//#isInt? #name #dist. #min #max
+//all N are in number of haploid individuals
+1 NCUR unif 1 10000 output
+1 N1 unif   1 10000 output
+1 N2 unif   1 10000 output
+1 N3 unif   1 10000 output
+1 N4 unif   1 10000 output
+1 N5 unif   1 10000 output
+1 N6 unif   1 10000 output
+1 N7 unif   1 10000 output
+1 N8 unif   1 10000 output
+1 N9 unif   1 10000 output
+
+[RULES]
+
+[COMPLEX PARAMETERS]
+1 R1 = N1/NCUR hide
+1 R2 = N2/N1 hide
+1 R3 = N3/N2 hide
+1 R4 = N4/N3 hide
+1 R5 = N5/N4 hide
+1 R6 = N6/N5 hide
+1 R7 = N7/N6 hide
+1 R8 = N8/N7 hide
+1 R9 = N9/N8 hide
+1 RX = 6000/N9 hide

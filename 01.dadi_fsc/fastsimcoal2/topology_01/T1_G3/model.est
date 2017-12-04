@@ -1,0 +1,31 @@
+// Priors and rules file
+// *********************
+[PARAMETERS]
+//#isInt? #name #dist.#min #max
+//all N are in number of haploid individuals
+1     NPOP0   	    unif     10000       1000000    output
+1     NPOP1 	    unif     10000       1000000    output
+1     NPOP2	    unif     10000       1000000    output
+1     NPOP3	    unif     10000       1000000    output
+1     NPOP13	    unif     10000       1000000    output
+1     NPOP02	    unif     10000       1000000    output
+1     NPOP0123	    unif     10000       1000000    output
+1     T1	    unif     10000       500000	    output
+1     Tadd1	    unif     1000        500000	    output
+1     Tadd2	    unif     1000        500000	    output
+
+0     M03_0	    logunif  1e-9        1e-3       output
+0     M12_0	    logunif  1e-9        1e-3       output
+0     M21_0	    logunif  1e-9        1e-3       output
+0     M30_0	    logunif  1e-9        1e-3       output
+
+[RULES]
+
+[COMPLEX PARAMETERS]
+
+0 RES1 = NPOP13/NPOP1 hide
+0 RES2 = NPOP02/NPOP0 hide
+0 RES3 = NPOP0123/NPOP02 hide
+
+1 T2 = T1+Tadd1 hide
+1 T3 = T2+Tadd2 hide
