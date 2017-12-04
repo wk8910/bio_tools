@@ -62,7 +62,7 @@ enrichment_result=paste(enrichment_result,line,sep=\"\n\");
 }
 print R "write.table(enrichment_result,file=\"$out\",append = TRUE,row.names=FALSE,col.names=FALSE,quote = FALSE);\n";
 close R;
-`$R_bin $Rscript`;
+`$R_bin $Rscript 2>/dev/null`;
 
 sub num{
     my ($file,$table)=@_;
