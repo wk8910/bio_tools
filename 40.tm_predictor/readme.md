@@ -1,7 +1,7 @@
-# From "Predicting melting temperature directly from protein sequences"  
-
+From "Predicting melting temperature directly from protein sequences"  
+```
 perl tm_predictor.pl <fasta file> > <score of fasta file>
-
+```
 ```
 Tm Index|Predited Tm
 >1 |>65℃
