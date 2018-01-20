@@ -26,7 +26,7 @@ foreach my $line(sort {$hash{$b}<=>$hash{$a}} keys %hash){
 
 foreach my $line(sort {$new_hash{$b}<=>$new_hash{$a}} keys %new_hash){
     my $percent=$new_hash{$line}/$num;
-    print "$line\t$new_hash{$line}\t$percent\n";
+    print "$line;\t$new_hash{$line}\t$percent\n";
 }
 
 sub sort_tree{
