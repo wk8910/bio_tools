@@ -34,6 +34,7 @@ my %tree ;
 my $max = 0 ;
 my %branch;
 foreach my $name (@sp){
+    # print "$name\t";
     my @a = split(/ $name /,$copy);
     my @element = split (/\s+/,$a[1]);
     # print "@element\n";
@@ -61,15 +62,16 @@ foreach my $name (@sp){
             }
         }
     }
+    # print "$sum\n";
 }
 
-#print "$max";
+# print "$max";
 foreach my $name (@sp){
     my $b ;
     my $a = $tree{$name} ;
     my $c = $branch{$name};
     $b=$max-$a+$c ;
-    $str =~ s/$name:[\de\-\.]+/$name:$b/;
+    $str =~ s/([(,]$name):[\de\-\.]+/$1:$b/;
 }
 
 open O ,"> $out ";
