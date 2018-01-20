@@ -11,7 +11,7 @@ while(<I>){
     chomp;
     my $line=$_;
     $num++;
-    $line=~s/:[\d\.e-]+//g;
+    $line=~s/:[\d\.eE-]+//g;
     $hash{$line}++;
 }
 close I;
