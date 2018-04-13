@@ -1,0 +1,1 @@
+/home/share/software/blast/ncbi-blast-2.4.0+/bin/tblastn -query query.fa -db blastdb -out blast.out -outfmt 0 -num_threads 16 -use_sw_tback # try to use local alignment when did not get a reasonable result with -use_sw_tback
