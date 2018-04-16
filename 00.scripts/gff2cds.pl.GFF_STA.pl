@@ -52,6 +52,7 @@ foreach my $id(keys %cds){
         else {
             my $intron=($start-1)-($pre+1)+1;
             push @intron_len,$intron;
+            $pre=$end;
         }
     }
 }
