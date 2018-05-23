@@ -1,0 +1,7 @@
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ds_gac.axt -o result/ENSGACP00000000016/kaks.ds_gac.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ds_pol.axt -o result/ENSGACP00000000016/kaks.ds_pol.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ds_ss.axt -o result/ENSGACP00000000016/kaks.ds_ss.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ds_tor.axt -o result/ENSGACP00000000016/kaks.ds_tor.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ss_gac.axt -o result/ENSGACP00000000016/kaks.ss_gac.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ss_pol.axt -o result/ENSGACP00000000016/kaks.ss_pol.axt.kaks -m GMYN
+/home/share/users/wangkun2010/software/kaks_calculator/KaKs_Calculator2.0/bin/Linux/KaKs_Calculator -i result/ENSGACP00000000016/kaks.ss_tor.axt -o result/ENSGACP00000000016/kaks.ss_tor.axt.kaks -m GMYN
