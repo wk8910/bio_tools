@@ -31,7 +31,6 @@ while (<I>) {
         next unless(@a>=8);
         my ($ref_start,$ref_end,$strand,$marker,$q_chr,$q_start,$q_end,$q_strand)=@a;
         next unless($marker eq "<->");
-        $q_strand_determination{$q_chr}{$q_strand}+=$q_end-$q_start+1;
         my $ref_mid=($ref_start+$ref_end)/2;
         my $q_mid=($q_start+$q_end)/2;
         if($q_strand eq "-"){
@@ -46,6 +45,7 @@ while (<I>) {
             $q_min=$t;
         }
         next unless($ref_mid>=$sel_start && $ref_mid<$sel_end);
+        $q_strand_determination{$q_chr}{$q_strand}+=$q_end-$q_start+1;
         if(!exists $lines{$q_chr}){
             $lines{$q_chr}{start}=$q_min;
             $lines{$q_chr}{end}=$q_max;
