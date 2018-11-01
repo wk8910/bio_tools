@@ -81,6 +81,7 @@ sub print_chr{
     my $pos_head=join " ",@pos;
     $pos_head="P ".$pos_head;
     open O,"> $outdir/$filename.$previous_chr.phase";
+    $ind_number*=2;
     print O "$ind_number\n$pos_number\n$pos_head\n";
     foreach my $ind(@ind){
         my @geno1=@{$geno{$previous_chr}{$ind}{1}};
