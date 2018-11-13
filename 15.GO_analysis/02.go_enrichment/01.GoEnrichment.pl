@@ -102,7 +102,7 @@ sub readlist{
     while(<F>){
         chomp;
         next if(/^\s*$/);
-        my @a=split("\t",$_);
+        my @a=split("\s+",$_);
         next if(!exists $go{$a[0]});
         for(my $i=1;$i<@a;$i++){
             if($a[$i]=~m/GO/){
