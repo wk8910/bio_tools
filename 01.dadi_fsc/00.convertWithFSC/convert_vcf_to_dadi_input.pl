@@ -4,11 +4,11 @@ use warnings;
 
 my ($vcf,$list)=@ARGV;
 # $list is like this:
-# BEGIN
-# sample1    population1
-# sample2    population1
-# sample3    out
-# END
+=cut
+sample1    population1
+sample2    population1
+sample3    out
+=cut
 # the sample name should be same as which in vcf file.
 my $usage="Usage: perl convert_vcf_to_dadi_input.pl <vcf file> <list file>\n";
 
@@ -103,6 +103,7 @@ sub read_list{
         chomp;
         next if(/^\#/);
         my @a=split(/\s+/);
+        next if(@a==1);
         $list{$a[0]}=$a[1];
     }
     close IN;
