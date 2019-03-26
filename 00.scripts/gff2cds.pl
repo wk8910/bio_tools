@@ -30,7 +30,7 @@ while(<I>){
     next unless($a[2] eq "CDS");
     $no++;
     my ($chr,$source,$start,$end,$strand,$phase,$name)=($a[0],$a[1],$a[3],$a[4],$a[6],$a[7],$a[8]);
-    $chr=~s/chr//g;
+    # $chr=~s/chr//g;
     $name=~/Parent=([^;]+)/;
     $name=$1;
     if(!exists $len{$name}){
