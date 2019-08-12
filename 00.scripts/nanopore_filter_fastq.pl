@@ -16,6 +16,9 @@ my @len;
 my ($num,$sum)=(0,0);
 my ($raw_num,$raw_sum)=(0,0);
 open L,"< $fastq_lst";
+open O1,"| gzip - > $out" or die "Cannot create $out.fa.gz\n";
+open O2,"> $sta" or die "Cannot create $sta\n";
+print O2 "# id\traw_num\traw_base\tclean_num\tclean_base\tmean_len\tN50\tN50_number\tmedium_len\tmax_len\n";
 while(<L>){
     chomp;
     my $fastq=$_;
@@ -27,9 +30,6 @@ while(<L>){
     }
     my $id=$fastq;
 
-    open O1,"| gzip - > $out" or die "Cannot create $out.fa.gz\n";
-    open O2,"> $sta" or die "Cannot create $sta\n";
-    print O2 "# id\traw_num\traw_base\tclean_num\tclean_base\tmean_len\tN50\tN50_number\tmedium_len\tmax_len\n";
     print O2 "$id\t";
 
     while(my $l1=<I>){
@@ -63,9 +63,8 @@ while(<L>){
         $sum+=$len;
     }
     close I;
-    close O1;
 }
-
+close O1;
 print O2 "$raw_num\t$raw_sum\t";
 &statistics(\@len,$num,$sum);
 close O2;
