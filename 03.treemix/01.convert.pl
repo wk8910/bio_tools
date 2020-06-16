@@ -45,6 +45,9 @@ while (<I>) {
     my %popSta;
     for(my $i=9;$i<@a;$i++){
         my $sample=$head[$i];
+	if(!exists $sample2pop{$sample}){
+	    die "Cannot find $sample in $popList!\n";
+	}
         my $pop=$sample2pop{$sample};
         next if($a[$i]=~/\.\/\./);
         $a[$i]=~/(\d)\/(\d)/;
