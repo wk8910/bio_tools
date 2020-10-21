@@ -47,7 +47,10 @@ result=rbind(result,x);\n";
 }
 print R "
 result\$chi_fdr=p.adjust(result\$chi_p,method='fdr');result\$fisher_fdr=p.adjust(result\$fisher_p,method='fdr');result\$hyper_fdr=p.adjust(result\$hyper_p,method='fdr');
-write.table(result,file=\"$out\",quote = FALSE,sep=\"\t\", row.names=FALSE);\n";
+result=result[order(result\$hyper_p,result\$fisher_p),]
+write.table(result,file=\"$out\",quote = FALSE,sep=\"\t\", row.names=FALSE);
+result=subset(result,result\$hyper_fdr<0.05)
+write.table(result,file=\"$out.strict\",quote = FALSE,sep=\"\t\", row.names=FALSE);\n";
 close R;
 `$R_bin $Rscript 2>/dev/null`;
 
