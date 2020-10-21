@@ -4,18 +4,14 @@ use warnings;
 
 my ($list1,$list2)=@ARGV;
 die "Usage: $0 <target list> <background>\n" if(@ARGV<2);
-my $oid="$list1.$list2";
 
 my $table="Gene2GoID.table";
 my $obo="gene_ontology.obo";
 
 my $R_bin="Rscript";
 
-my $out="result.$oid.txt";
-open(T,"> $out")||die"$out $!\n";
-print T "GO\tType\tFunction\tfisher\tf.fdr\tchi\tc.fdr\thyper\th.fdr\tlist1InGO\tlist1OutGO\tlist1Percent\tlist2InGO\tlist2OutGO\tlist2Percent\tPercentDiff";
-close T;
-my $Rscript="runR.$oid.r";
+my $Rscript="$list1.Rscript";
+my $out="$list1.goEnrichment";
 
 my %GOname=&readobo($obo);
 
@@ -29,10 +25,11 @@ my $go_number=&read_table($table);
 print "go number: $go_number\n";
 
 open(R,"> $Rscript");
-print R "enrichment_result=\"\";";
+# print R "enrichment_result=\"\";";
+print R "result=data.frame();\n";
 foreach my $go(sort keys %GOname){
     next unless(exists $GO1{$go} || exists $GO2{$go});
-    my $a=keys %{$GO1{$go}}; 
+    my $a=keys %{$GO1{$go}};
     #next if($a<5);
     my $b=$num1-$a;
     my $p1=$a/($a+$b);
@@ -41,26 +38,16 @@ foreach my $go(sort keys %GOname){
     my $d=$num2-$c;
     my $p2=$c/($c+$d);
     my $diff=$p1-$p2;
-    #next unless($a > 5 || $c > 5);
+    next unless($a > 5 || $c > 5);
     print R "
 data_matrix=matrix(c($a,$b,$c,$d),ncol=2);
-
-chi_p=chisq.test(data_matrix);
-chi_fdr=p.adjust(chi_p\$p.value,method='fdr',$go_number);
-
-fisher_p=fisher.test(data_matrix);
-fisher_fdr=p.adjust(fisher_p\$p.value,method='fdr',$go_number);
-
-hyper_p=1-phyper($a-1,$c,$num2-$c,$num1)
-hyper_fdr=p.adjust(hyper_p,method='fdr',$go_number);
-
-line=paste(\"$go\t$GOname{$go}{namespace}\t$GOname{$go}{name}\t\",fisher_p\$p.value,\"\t\",fisher_fdr,\"\t\",chi_p\$p.value,\"\t\",chi_fdr,\"\t\",hyper_p,\"\t\",hyper_fdr,\"\t$a\t$b\t$p1\t$c\t$d\t$p2\t$diff\");
-# line;
-# write.table(line,file=\"$out\",append = TRUE,row.names=FALSE,col.names=FALSE,quote = FALSE);
-enrichment_result=paste(enrichment_result,line,sep=\"\n\");
-";
+chi_p=chisq.test(data_matrix);fisher_p=fisher.test(data_matrix);hyper_p=1-phyper($a-1,$c,$num2-$c,$num1);
+x=data.frame(GO=\"$go\",type=c(\"$GOname{$go}{namespace}\"),property=c(\"$GOname{$go}{name}\"),list1InGO=c($a),list1Num=c($num1),BackgroundInGO=c($c),BackgroundNum=c($num2),diff=c($diff),chi_p=c(chi_p\$p.value),fisher_p=c(fisher_p\$p.value),hyper_p=c(hyper_p)); row.names(x)[1]=\"$go\";
+result=rbind(result,x);\n";
 }
-print R "write.table(enrichment_result,file=\"$out\",append = TRUE,row.names=FALSE,col.names=FALSE,quote = FALSE);\n";
+print R "
+result\$chi_fdr=p.adjust(result\$chi_p,method='fdr');result\$fisher_fdr=p.adjust(result\$fisher_p,method='fdr');result\$hyper_fdr=p.adjust(result\$hyper_p,method='fdr');
+write.table(result,file=\"$out\",quote = FALSE,sep=\"\t\", row.names=FALSE);\n";
 close R;
 `$R_bin $Rscript 2>/dev/null`;
 
@@ -102,7 +89,7 @@ sub readlist{
     while(<F>){
         chomp;
         next if(/^\s*$/);
-        my @a=split("\s+",$_);
+        my @a=split(/\s+/,$_);
         next if(!exists $go{$a[0]});
         for(my $i=1;$i<@a;$i++){
             if($a[$i]=~m/GO/){
@@ -115,31 +102,29 @@ sub readlist{
 }
 
 sub readobo{
-  my $file=shift;
-  my %r;
-  open(F,$file)||die "$file $!";
-  while(<F>){
-    chomp;
-    if(/^\[Term\]$/){
-      my $idline=<F>;
-      chomp $idline;
-      $idline=~s/id: //g;
-      
-      my $nameline=<F>;
-      chomp $nameline;
-      $nameline=~s/name: //g;
-      
-      my $namespaceline=<F>;
-      chomp $namespaceline;
-      $namespaceline=~s/namespace: //g;
-      $r{$idline}{name}=$nameline;
-      $r{$idline}{namespace}=$namespaceline;
-  }
-}
-  close(F);
-  #print scalar(keys %r);
-  #die;
-  return %r;
+    my $file=shift;
+    my %r;
+    open(F,$file)||die "$file $!";
+    while(<F>){
+        chomp;
+        if(/^\[Term\]$/){
+            my $idline=<F>;
+            chomp $idline;
+            $idline=~s/id: //g;
+
+            my $nameline=<F>;
+            chomp $nameline;
+            $nameline=~s/name: //g;
+
+            my $namespaceline=<F>;
+            chomp $namespaceline;
+            $namespaceline=~s/namespace: //g;
+            $r{$idline}{name}=$nameline;
+            $r{$idline}{namespace}=$namespaceline;
+        }
+    }
+    close(F);
+    return %r;
 }
 
 sub read_table{
@@ -147,11 +132,11 @@ sub read_table{
     open(I,"< $table") || die "Cannot open $table";
     my %go_term;
     while(<I>){
-	chomp;
-	my @a=split(/\s+/);
-	for(my $i=1;$i<@a;$i++){
-	    $go_term{$a[$i]}++;
-	}
+        chomp;
+        my @a=split(/\s+/);
+        for(my $i=1;$i<@a;$i++){
+            $go_term{$a[$i]}++;
+        }
     }
     close I;
     my $go_number=keys %go_term;
