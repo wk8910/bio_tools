@@ -40,7 +40,7 @@ clustered_data_mean.to_csv(output_file_path, sep='\t', index=True)
 
 scaled_data_mean_df = pd.DataFrame(scaled_data_mean, index=data_mean.index, columns=data_mean.columns)
 scaled_data_mean_df['Cluster'] = clusters_mean
-scaled_data_mean_df.to_csv("scaled_data_mean.txt", sep='\t', index=True)
+# scaled_data_mean_df.to_csv("scaled_data_mean.txt", sep='\t', index=True)
 
 # 确定子图的布局，例如如果有4个聚类，可以使用2行2列的布局
 rows = 2  # 这个值可以根据聚类的数量和您希望的布局进行调整
@@ -50,6 +50,9 @@ cols = 2  # 同上
 line_color = 'orange'  # 您可以选择任何您喜欢的颜色
 line_alpha = 0.01  # 设置透明度，范围从0（完全透明）到1（完全不透明）
 x_labels = ["fruit", "root", "leaf", "stem"]
+
+plt.rcParams['pdf.fonttype'] = 42
+plt.rcParams['ps.fonttype'] = 42
 
 # 创建一个PDF文件
 with PdfPages('kmeans.pdf') as pdf:  # 替换为您想要保存的文件路径
