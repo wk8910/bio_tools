@@ -41,6 +41,7 @@ def translate_dna_to_protein(dna_seq):
         'TGC':'C', 'TGT':'C', 'TGA':'*', 'TGG':'W',
     }
     protein_seq = ''
+    # dna_seq = dna_seq.upper()
     for i in range(0, len(dna_seq), 3):
         codon = dna_seq[i:i+3]
         protein_seq += codon_table.get(codon, 'X')  # 使用'X'标记未知的密码子
@@ -89,6 +90,7 @@ def extract_cds_from_gff(gff_file, genome_sequences):
             cds_seq = genome_sequences[seq_id][start-1:end]  # 转换为0-based
             cds_seq_combined += cds_seq
 
+        cds_seq_combined = cds_seq_combined.upper()
         if strand == '-':  # 反向互补处理
             cds_seq_combined = reverse_complement(cds_seq_combined)
 
