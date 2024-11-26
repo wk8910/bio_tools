@@ -52,55 +52,77 @@ def extract_cds_from_gff(gff_file, genome_sequences):
     gene_cds_info = {}
     cds_sequences = {}
     cds_pep_sequences = {}
+    gff_lines = {}  # 存储每个CDS ID对应的所有相关GFF行（包括mRNA和CDS）
+    mrna_to_cds = {}  # 存储mRNA ID到CDS ID的映射
 
     with open(gff_file, 'r') as gff:
         for line in gff:
-            if line.startswith('#') or not line.strip(): continue  # 忽略注释行
+            if line.startswith('#') or not line.strip(): 
+                continue
+            
             parts = re.split(r'\s+', line.strip())
-            if len(parts) < 9: continue
-            if parts[2] == 'CDS':
+            if len(parts) < 9: 
+                continue
+
+            attributes = parts[8]
+            if parts[2] == 'mRNA':
+                # 提取mRNA的ID
+                mrna_id = None
+                for attribute in attributes.split(';'):
+                    if attribute.startswith('ID='):
+                        mrna_id = attribute.split('=')[1]
+                        break
+                if mrna_id:
+                    if mrna_id not in gff_lines:
+                        gff_lines[mrna_id] = []
+                    gff_lines[mrna_id].append(line.strip())
+
+            elif parts[2] == 'CDS':
                 seq_id = parts[0]
-                start = int(parts[3])  # 保持为1-based用于排序
+                start = int(parts[3])
                 end = int(parts[4])
                 strand = parts[6]
-                attributes = parts[8]
 
-                # 从属性字段中提取CDS ID
-                cds_id = None
+                # 提取CDS所属的mRNA ID
+                parent_id = None
                 for attribute in attributes.split(';'):
                     if attribute.startswith('Parent='):
-                        cds_id = attribute.split('=')[1]
+                        parent_id = attribute.split('=')[1]
                         break
 
-                # 检查是否成功提取到cds_id
-                if not cds_id:
-                    print('Error: CDS ID not found')
+                if not parent_id:
+                    print('Error: Parent ID not found for CDS')
                     continue
 
-                # 将CDS信息按基因ID和起始位置存储
-                if cds_id not in gene_cds_info:
-                    gene_cds_info[cds_id] = []
-                gene_cds_info[cds_id].append((seq_id, start, end, strand))
+                # 将CDS行添加到对应mRNA的GFF行列表中
+                if parent_id not in gff_lines:
+                    gff_lines[parent_id] = []
+                gff_lines[parent_id].append(line.strip())
 
-    # 对每个基因的CDS片段按照起始位置排序并连接
-    for cds_id, cds_parts in gene_cds_info.items():
-        cds_parts.sort(key=lambda x: x[1])  # 按start排序
+                # 存储CDS信息
+                if parent_id not in gene_cds_info:
+                    gene_cds_info[parent_id] = []
+                gene_cds_info[parent_id].append((seq_id, start, end, strand))
+
+    # 处理每个mRNA的CDS序列
+    for mrna_id, cds_parts in gene_cds_info.items():
+        cds_parts.sort(key=lambda x: x[1])
         cds_seq_combined = ''
-        for seq_id, start, end, strand in cds_parts:
-            cds_seq = genome_sequences[seq_id][start-1:end]  # 转换为0-based
+        strand = cds_parts[0][3]  # 获取链的方向
+
+        for seq_id, start, end, _ in cds_parts:
+            cds_seq = genome_sequences[seq_id][start-1:end]
             cds_seq_combined += cds_seq
 
         cds_seq_combined = cds_seq_combined.upper()
-        if strand == '-':  # 反向互补处理
+        if strand == '-':
             cds_seq_combined = reverse_complement(cds_seq_combined)
 
-        cds_sequences[cds_id] = cds_seq_combined
-        # 翻译CDS到蛋白质序列
+        cds_sequences[mrna_id] = cds_seq_combined
         protein_seq = translate_dna_to_protein(cds_seq_combined)
-        cds_pep_sequences[cds_id] = protein_seq
+        cds_pep_sequences[mrna_id] = protein_seq
 
-    return cds_sequences, cds_pep_sequences
-
+    return cds_sequences, cds_pep_sequences, gff_lines
 
 def reverse_complement(seq):
     """获取DNA序列的反向互补序列。"""
@@ -111,19 +133,36 @@ def main(fasta_file, gff_file, output_prefix):
     # 读取基因组序列
     genome_sequences = read_fasta(fasta_file)
 
-    # 提取CDS并翻译成蛋白质序列，同时保留CDS序列
-    cds_sequences, cds_pep_sequences = extract_cds_from_gff(gff_file, genome_sequences)
+    # 提取CDS并翻译成蛋白质序列，同时保留CDS序列和GFF信息
+    cds_sequences, cds_pep_sequences, gff_lines = extract_cds_from_gff(gff_file, genome_sequences)
 
     # 保存CDS序列到文件
     with open(f"{output_prefix}_cds.fasta", 'w') as cds_file:
         for cds_id, cds_seq in cds_sequences.items():
             cds_file.write(f">{cds_id}\n{cds_seq}\n")
 
-    # 保存肽序列到文件
-    with open(f"{output_prefix}_pep.fasta", 'w') as pep_file:
-        for cds_id, pep_seq in cds_pep_sequences.items():
-            if '*' in pep_seq[0:-1]: continue
-            pep_file.write(f">{cds_id}\n{pep_seq}\n")
+    # 保存肽序列到文件，并将GFF信息分别输出到两个文件
+    with open(f"{output_prefix}_pep.fasta", 'w') as pep_file, \
+         open(f"{output_prefix}_premature_stop_codons.gff", 'w') as stop_file, \
+         open(f"{output_prefix}_complete_proteins.gff", 'w') as complete_file:
+        
+        # 写入GFF文件头部注释
+        stop_file.write("##gff-version 3\n")
+        complete_file.write("##gff-version 3\n")
+        
+        for mrna_id, pep_seq in cds_pep_sequences.items():
+            if '*' in pep_seq[0:-1]:
+                # 将含有提前终止密码子的基因的完整GFF信息（包括mRNA和CDS）写入到停止密码子文件
+                for gff_line in gff_lines[mrna_id]:
+                    stop_file.write(f"{gff_line}\n")
+                continue
+            
+            # 将成功翻译的基因序列写入到FASTA文件
+            pep_file.write(f">{mrna_id}\n{pep_seq}\n")
+            
+            # 将成功翻译的基因的完整GFF信息（包括mRNA和CDS）写入到完整蛋白质文件
+            for gff_line in gff_lines[mrna_id]:
+                complete_file.write(f"{gff_line}\n")
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Extract CDS and translate to protein sequences from a GFF file and a genome sequence file.")
