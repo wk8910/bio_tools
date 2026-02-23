@@ -18,3 +18,22 @@ nytprof.out
 *.o
 *.bs
 /_eumm/
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Editor backups
+*~
+*.swp
+*.swo
+
+# Analysis outputs (generated files, not source)
+*.log
+*.pdf
+*.pl.sh
+
+# OS
+.DS_Store
+Thumbs.db
